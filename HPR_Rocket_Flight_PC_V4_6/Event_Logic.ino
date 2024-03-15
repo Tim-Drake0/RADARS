@@ -7,62 +7,11 @@
 //17 JUL 21: initial breakout created
 //19 SEP 23: removed accelerometer based apogee detection due to several early deployments.
 //---------------------------------
-float CD;
-float yBest=0;
+float CD=1.0; // KEEP
+float yBest=0.0; // KEEP
 float dragIdeal[800];
-void getIdealTrajectory(){ // Added for RADARS ***************************************************
-  float diameter = 4.0/12.0; // ft
-  float angle_rad = 3.14159/180.0;
-  float flight_angle = 89.0;
-  float vy_next=fusionVel*sinf((offVert*.1)*angle_rad); float vy;  // what is flight angle var
-  float y_next=fusionAlt; float y;
-  float delta_next;
-  float Velocity_next=fusionVel; float Velocity;
-  float Drag;
-  float ay;
-  float weight = 14.91; // lb at burnout
-  float g = -32.2; // ft/s^2
-  //Calculate air density
-  const float R = 287.05; //R value for dry air
-  float airDensity = (baro.pressure * 100) / (R * (baro.temperature + 273.15));
-  if(settings.testMode){
-    updateSimVars();
-    vy_next=simVars.fusionVel;
-    offVert=simVars.offVert;
-    airDensity = (simVars.baroPress * 100) / (R * (simVars.baroPress + 273.15));
-    y_next=simVars.fusionAlt;
-  }
-  Serial.println("vy_next: "); Serial.print(vy_next);
-  Serial.println("offVert: "); Serial.print(offVert);
-  Serial.println("airDensity: "); Serial.print(airDensity);
-  Serial.println("y_next: "); Serial.print(y_next);
-  for (int t=0; t<800; t=t+1){
-    vy=vy_next;
-    y=y_next;
-    float rho_low = 0.002377; float rho_high = 0.002048; // slug/ft 
-    float alt_low = 0.00000; float alt_high = 5000.000; // ft
-    float Swet_tube = 3.14159*sq(0.5*diameter);
-    Drag = 0.5*airDensity*sq(vy)*CD*Swet_tube; // lbf
-    
-    // Acceleration in x & y at time t
-    ay = -(((0-Drag)*sinf((offVert*.1)*angle_rad))-weight)/(weight/g);
-    vy_next = vy + ay*0.05;
-    if (vy < 1){
-      delta_next = 0;
-    }
-    Velocity_next =vy_next;
-    y_next = y + vy_next*0.05;
-    if(5000-y_next < 5000-yBest && y_next < 6000){
-      yBest=y_next;
-    }
-    dragIdeal[t] = Drag;
-    Serial.println("y_next: "); Serial.print(y_next);
-    Serial.println("Drag: "); Serial.print(Drag);
-    Serial.println("Velocity_next: "); Serial.print(Velocity_next);
-    Serial.println("vy: "); Serial.print(vy);
-    Serial.println("ay: "); Serial.print(ay);
-  }
-}
+int trajectoryEvent=0; // KEEP
+
 
 void checkEvents(){
   //Check for timeout
@@ -116,22 +65,30 @@ void checkEvents(){
     if(settings.inflightRecover != 0 && !settings.testMode){EEPROM.update(eeprom.lastEvent, radio.event);}
     events.boosterBurnoutCheck = true;
     fltTime.boosterBurnout = fltTime.timeCurrent;
-    
-  }
-  if(simVars.fltEvents[2]==1){
     // Added for RADARS *********************************************************************************
-    float yBest=0;
-    while(4000-yBest > 50 || 4000-yBest < -50) {
-      getIdealTrajectory();
-      if(5000-yBest > 0){
-        CD=CD-.01;
+    if(trajectoryEvent==0){
+      Serial.println("Getting Ideal Trajectory!");
+      trajectoryEvent=1;
+      while(5000.0-yBest > 10.0 || 5000.0-yBest < -10.0) {
+        yBest=0.0;
+        getIdealTrajectory();
+        if(5000.0-yBest > 0.0){CD=CD-.01;}
+        else if(5000.0-yBest < 0.0){CD=CD+0.01;}
       }
-      else if(4000-yBest < 0){
-        CD=CD+0.01;
-      }
-      //Serial.println("YBEST: "); Serial.print(yBest);
     }
-    
+  }
+  // Added for RADARS *********************************************************************************
+  if(trajectoryEvent==0 && settings.testMode){
+    Serial.println("Getting Ideal Trajectory!");
+    trajectoryEvent=1;
+    while(5000.0-yBest > 10.0 || 5000.0-yBest < -10.0) {
+      yBest=0.0;
+      Serial.print("CD: "); Serial.println(CD);
+      getIdealTrajectory();
+      Serial.print("yBest: "); Serial.println(yBest);
+      if(5000.0-yBest > 0.0){CD=CD-.01;}
+      else if(5000.0-yBest < 0.0){CD=CD+0.01;}
+    }
   }
   //check for booster motor burp for 1 second after burnout is detected
   if (events.boosterBurnoutCheck){
