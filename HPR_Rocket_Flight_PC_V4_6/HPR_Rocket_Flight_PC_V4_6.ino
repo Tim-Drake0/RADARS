@@ -1861,7 +1861,6 @@ void loop(void){
       EEPROM.update(eeprom.lastEvent, radio.event);}}
 
   if (events.liftoff) {
-    updateSimVars();
     //capture the cycles between samples
     if(settings.testMode){cyclesBtwn++;}
 
@@ -1949,9 +1948,11 @@ void loop(void){
       if (controlTime - timeLastControl >= controlInterval) {
         //if active stabilization is activated, set the canards
         
-        Serial.println(simVars.fltEvents);
-        if((settings.stableVert || settings.stableRotn) && simVars.fltEvents[3]=="0" && simVars.fltEvents[1]=="1"){setAirbrakes();}
-        // OLD: if((settings.stableVert || settings.stableRotn) && !events.apogee && events.boosterBurnout){setCanards();} // Added for RADARS ***************************************************
+        if(settings.testMode){
+          if((settings.stableVert || settings.stableRotn) && !events.apogee){setAirbrakes();} // Removing burnout bool for testing 
+        }else{
+          if((settings.stableVert || settings.stableRotn) && !events.apogee && events.boosterBurnout){setAirbrakes();} 
+        }
         //if RTB is on and we are post apogee, then set canards to return to launch point
         if(settings.flyBack && events.apogeeFire && !events.mainDeploy){setRTB();}        
         //update control timer
