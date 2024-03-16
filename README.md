@@ -1,7 +1,7 @@
 # RADARS (Rapid Altitude Determination and Response System)
 **RADARS.ino is the MATLAB code integrated into SparkyVT's HPR flight computer code.**
 
-Project RADARS provides autonomous altitude control to solid motor rockets during
+My senior design capstone project, RADARS, provides autonomous altitude control to solid motor rockets during
 ascent. The system utilizes an air braking mechanism to adjust drag, thereby controlling
 altitude. MATLAB and OpenRocket simulations predict flight trajectory and apogee while
 Computational Fluid Dynamics (CFD) in ANSYS and OpenFOAM assess airbrake
