@@ -11,6 +11,7 @@ design process, simulation methods, and flight test procedures, emphasizing the 
 objective of achieving precise altitude control.
 
 **Using/Running Code:**
+
 The MATLAB code is used to size the airbrakes according to rocket specifications, such as body tube diameter, rocket length, target altitude, 
 and burnout conditions (altitude and velocity). These values were taken from OpenRocket simulations. The program begins by running various simulations
 at various CD values until the apogee is +/- 10ft to the target altitude. Drag values are tabulated for each time step of the simulation. The goal of the
@@ -22,10 +23,11 @@ The flight computer (custom-built by SparkyVT) utilizes a Teensy 3.5 as the main
 SD card in the Teensy and the servo signal wires are connected to the flight computer. 
 
 **Required Libraries**
+
 TinyGPS++
 SDfat and/or SD
 
-**Expected Plots From MATLAB CODE**
+**Expected Plots From MATLAB Code**
 ![image](https://github.com/Tim-Drake0/RADARS/assets/84010200/d04a6a09-95a8-4dbb-b7fb-888c4ab28789)
 
 ![image](https://github.com/Tim-Drake0/RADARS/assets/84010200/387df904-e6df-401f-ac19-1acaaeb9b3c4)
