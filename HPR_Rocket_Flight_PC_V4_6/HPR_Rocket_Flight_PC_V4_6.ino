@@ -110,10 +110,10 @@ HardwareSerial *HWSERIAL;
 TinyGPSPlus GPS;
 
 //Servo Setup
-PWMServo canardYaw1; 
-PWMServo canardYaw2;
-PWMServo canardPitch3;
-PWMServo canardPitch4;
+PWMServo airbrake1; 
+PWMServo airbrake2;
+PWMServo airbrake3;
+PWMServo airbrake4;
 PWMServo actionServo5;
 PWMServo actionServo6;
 PWMServo actionServo7;
@@ -1262,10 +1262,10 @@ void setup(void) {
     GPSecho = false; radioDebug = false;
 
     //attach the servos
-    canardYaw1.attach(pins.servo1);
-    canardYaw2.attach(pins.servo2);
-    canardPitch3.attach(pins.servo3);
-    canardPitch4.attach(pins.servo4);
+    airbrake1.attach(pins.servo1);
+    airbrake2.attach(pins.servo2);
+    airbrake3.attach(pins.servo3);
+    airbrake4.attach(pins.servo4);
 
     //read the trim settings from EEPROM
     servo1trim = 5;//(int8_t)EEPROM.read(eeprom.servo1trim);
@@ -1281,20 +1281,20 @@ void setup(void) {
     //Test canards
     int b=56;
     float m=0.6125;
-    canardYaw1.write((m*75)+b-servo1trim);
-    canardYaw2.write((m*75)+b-servo2trim);
-    canardPitch3.write((m*75)+b-servo3trim);
-    canardPitch4.write((m*75)+b-servo4trim);
+    airbrake1.write((m*75)+b-servo1trim);
+    airbrake2.write((m*75)+b-servo2trim);
+    airbrake3.write((m*75)+b-servo3trim);
+    airbrake4.write((m*75)+b-servo4trim);
     delay(1000);
-    canardYaw1.write((m*45)+b-servo1trim);
-    canardYaw2.write((m*45)+b-servo2trim);
-    canardPitch3.write((m*45)+b-servo3trim);
-    canardPitch4.write((m*45)+b-servo4trim);
+    airbrake1.write((m*45)+b-servo1trim);
+    airbrake2.write((m*45)+b-servo2trim);
+    airbrake3.write((m*45)+b-servo3trim);
+    airbrake4.write((m*45)+b-servo4trim);
     delay(1000);
-    canardYaw1.write((m*0)+b-servo1trim);
-    canardYaw2.write((m*0)+b-servo2trim);
-    canardPitch3.write((m*0)+b-servo3trim);
-    canardPitch4.write((m*0)+b-servo4trim);}
+    airbrake1.write((m*0)+b-servo1trim);
+    airbrake2.write((m*0)+b-servo2trim);
+    airbrake3.write((m*0)+b-servo3trim);
+    airbrake4.write((m*0)+b-servo4trim);}
 
   //otherwise disable the servos and ensure that stray voltages do not cause any attached servos to move
   else{
