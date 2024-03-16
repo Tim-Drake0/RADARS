@@ -6,32 +6,26 @@ format long g;
 format compact;
 fontSize = 20;
 
-Data = readtable('K700_Flight_Data.csv');
-Altitude = Data.Altitude_ft_; % [ft]
-%% Main Code
 simTime = 40; % simulated seconds after burnout 
-
 %% Initial Conditions (are at burnout)
-angle = 86.95; % Degrees
-x0 = 57.93;
-y0 = 1732.1;
-v0 = 671.5;
-
+angle = 86.95; % [Deg]
+x0 = 57.93; % [ft]
+y0 = 1732.1; % [ft]
+v0 = 671.5; % [ft/s]
+targetAlt=4000;
 % Time
-timeStep = 0.01;
+timeStep = 0.05;
 time = timeStep:timeStep:simTime+timeStep; % time vector 
-
 
 % Find perfect ideal curve:
 apogeeIdeal=0;
 CD=1;
-%while 5000-apogeeIdeal >10 || 5000-apogeeIdeal < -10 
-for i=1:2
+while targetAlt-apogeeIdeal >10 || targetAlt-apogeeIdeal < -10 
     % Ideal Curve
     [~,yIdeal,apogeeIdeal,~,~,dragIdeal]=getTrajectory(time, timeStep, angle, x0, y0, v0, 0, 0, CD, 0);
-    if 5000-apogeeIdeal > 0
+    if targetAlt-apogeeIdeal > 0
         CD=CD-.01;
-    elseif 5000-apogeeIdeal < 0
+    elseif targetAlt-apogeeIdeal < 0
         CD=CD+.01;
     end
 end
@@ -98,15 +92,14 @@ ylabel("Deflection Angle (deg)")
 
 %% Functions
 function [x,y,apogee,delta,Velocity, Drag]=getTrajectory(time, step, angle, x0, y0, v0, withAB, dragIdeal,CD,timeToIdealApogee)
-    g = -32.2; % ft/s^2
+    g = -32.2; % [ft/s^2]
     %% Rocket Data
-    diameter = 4/12; % ft
-    width_AB = 2/12; % ft
-    length_AB = 3/12; % ft
+    diameter = 4/12; % [ft]
+    width_AB = 2/12; % [ft]
+    length_AB = 3/12; % [ft]
     num_AB = 4;
-    weight = 15.83; % lb at burnout
-    
-    %========== COMPUTATIONS =================================================================    
+    weight = 15.83; % [lb] at burnout
+     
     % Preallocate Matracies
     ax=zeros(1,length(time));
     ay=zeros(1,length(time));
@@ -153,9 +146,6 @@ function [x,y,apogee,delta,Velocity, Drag]=getTrajectory(time, step, angle, x0, 
                     mult=1;
                 end
                 deltaAngle = mult*asind(abs(delta_S)/(num_AB*width_AB*length_AB));
-                if deltaAngle > 4 % servos can only move 4deg every .01 sec
-                    deltaAngle=4
-                end
                 delta(t+1) = delta(t) + deltaAngle;
             end
             if delta(t+1) > 80
