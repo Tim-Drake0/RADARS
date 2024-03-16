@@ -1,4 +1,6 @@
 # RADARS (Rapid Altitude Determination and Response System)
+![Picture3](https://github.com/Tim-Drake0/RADARS/assets/84010200/11439887-467e-4d5d-8bba-35c412aa3bb5)
+
 **RADARS.ino is the MATLAB code integrated into SparkyVT's HPR flight computer code: https://github.com/SparkyVT/HPR-Rocket-Flight-Computer**
 
 My senior design capstone project, RADARS, provides autonomous altitude control to solid motor rockets during
