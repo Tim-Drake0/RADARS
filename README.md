@@ -16,7 +16,7 @@ objective of achieving precise altitude control.
 
 The MATLAB code is used to size the airbrakes according to rocket specifications, such as body tube diameter, rocket length, target altitude, 
 and burnout conditions (altitude and velocity). These values were taken from OpenRocket simulations. The program begins by running various simulations
-at various CD values until the apogee is +/- 10ft to the target altitude. Drag values are tabulated for each time step of the simulation. The goal of the
+at various CD values until the apogee is +/- 50ft to the target altitude. Drag values are tabulated for each time step of the simulation. The goal of the
 airbrake algorithm is to match the drag values for the time step by changing how much the airbrakes are deflected based on how much drag is required. 
 
 RADARS.ino is the equivalent of this code, but in C++ and integrated into SparkyVT's code.
