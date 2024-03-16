@@ -1,5 +1,5 @@
 # RADARS (Rapid Altitude Determination and Response System)
-**RADARS.ino is the MATLAB code integrated into SparkyVT's HPR flight computer code.**
+**RADARS.ino is the MATLAB code integrated into SparkyVT's HPR flight computer code: https://github.com/SparkyVT/HPR-Rocket-Flight-Computer**
 
 My senior design capstone project, RADARS, provides autonomous altitude control to solid motor rockets during
 ascent. The system utilizes an air braking mechanism to adjust drag, thereby controlling
@@ -10,5 +10,24 @@ airbrakes for 5 test flights to iteratively refine the control algorithm. This p
 design process, simulation methods, and flight test procedures, emphasizing the project's
 objective of achieving precise altitude control.
 
-Airbrake_Rocet_Sim.m is used to numerically simulate the flight of a high-powered rocket using airbrakes.
-Some minor changes were made to HPR_Rocket_Flight_PC_V4_6.ino and Event_Logic.ino to fully integrate RADARS.
+**Using/Running Code:**
+The MATLAB code is used to size the airbrakes according to rocket specifications, such as body tube diameter, rocket length, target altitude, 
+and burnout conditions (altitude and velocity). These values were taken from OpenRocket simulations. The program begins by running various simulations
+at various CD values until the apogee is +/- 10ft to the target altitude. Drag values are tabulated for each time step of the simulation. The goal of the
+airbrake algorithm is to match the drag values for the time step by changing how much the airbrakes are deflected based on how much drag is required. 
+
+RADARS.ino is the equivalent of this code, but in C++ and integrated into SparkyVT's code.
+
+The flight computer (custom-built by SparkyVT) utilizes a Teensy 3.5 as the main computer. The code is tested and uploaded using Arduino IDE to an 
+SD card in the Teensy and the servo signal wires are connected to the flight computer. 
+
+**Required Libraries**
+TinyGPS++
+SDfat and/or SD
+
+**Expected Plots From MATLAB CODE**
+![image](https://github.com/Tim-Drake0/RADARS/assets/84010200/d04a6a09-95a8-4dbb-b7fb-888c4ab28789)
+
+![image](https://github.com/Tim-Drake0/RADARS/assets/84010200/99e0dc63-3583-4ba3-b1aa-446c365d3510)
+
+![image](https://github.com/Tim-Drake0/RADARS/assets/84010200/db996117-773c-433e-8c4b-728370bd01da)
