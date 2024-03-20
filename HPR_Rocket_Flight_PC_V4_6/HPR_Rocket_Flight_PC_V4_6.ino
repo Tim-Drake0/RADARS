@@ -1939,11 +1939,10 @@ void loop(void){
       dx = dy = dz = 0L;
       lastRotn = fltTime.timeCurrent;}
  
-    //run event logic
-    checkEvents();
+    
 
     //update the canards throws if stabilization or flyback is enabled
-  if(settings.stableRotn || settings.stableVert || settings.flyBack){
+    if(settings.stableRotn || settings.stableVert || settings.flyBack){
       uint32_t controlTime = micros();
       if (controlTime - timeLastControl >= controlInterval) {
         //if active stabilization is activated, set the canards
@@ -1956,7 +1955,11 @@ void loop(void){
         //if RTB is on and we are post apogee, then set canards to return to launch point
         if(settings.flyBack && events.apogeeFire && !events.mainDeploy){setRTB();}        
         //update control timer
-        timeLastControl = controlTime;}}
+        timeLastControl = controlTime;
+      }
+    }
+    //run event logic
+    checkEvents();
     
     //Read the battery voltage
     if((fltTime.timeCurrent - lastVolt > voltRate) || pyroFire){
