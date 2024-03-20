@@ -205,4 +205,10 @@ df.plot(
         x='flightTime',
         title = 'Packets Sent: ' + str(sentPacket)[0:3],
         legend = False)
-
+#plot airbrake deflection
+df.fillna(method='pad').plot(
+    x = 'flightTime',
+    xlabel = 'Flight Time',
+    y = 'deflectionAngle',
+    ylabel = 'degrees',
+    title = 'Airbrake Deflection')
