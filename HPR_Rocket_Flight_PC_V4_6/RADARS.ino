@@ -48,7 +48,7 @@ void getIdealTrajectory(){
   Table_CD[40]=0.644; Table_CD[45]=0.649; Table_CD[50]=0.689; Table_CD[55]=0.69;
   Table_CD[60]=0.689; Table_CD[65]=0.698; Table_CD[70]=0.69; Table_CD[75]=0.71; Table_CD[80]=0.729;
   float vy_next=fusionVel*sin(yawY*0.1*flight_angle*angle_rad); float vy;  // initial velocity in y at burnout
-  float y_next=fusionAlt; float y;
+  float y_next=fusionAlt; float y;  
   //Calculate air density
   float rho_low =(baro.pressure * 100) / (R * (baro.temperature + 273.15)); float rho_high = 0.002048; // [slug/ft] ===Check Units===
   float alt_low = fusionAlt; float alt_high = 5000.0; // [ft] ===Check Units===
@@ -167,7 +167,8 @@ void setAirbrakes(){
   }
   deltaAngle = mult*asinf((abs(delta_S)/(num_AB*width_AB*length_AB)))*(1.0/angle_rad); // [deg]
   delta=delta+deltaAngle; // [deg]
-  if(delta >= 80.0){delta = 80.0;} // limit to 80deg max deflection
+  if(delta > 80.0){delta = 80.0;} // limit to 80deg max deflection
+  if(delta < 0.0){delta = 0.0;} // limit to 0deg min deflection
   // Deploy airbrakes with corrected servo deflection ratio
   airbrake1.write((0.6125*delta)+56-servo1trim);
   airbrake2.write((0.6125*delta)+56-servo2trim);
