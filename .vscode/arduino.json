@@ -1,0 +1,6 @@
+{
+    "configuration": "usb=serial,speed=120,opt=o2std,keys=en-us",
+    "board": "teensy:avr:teensy35",
+    "port": "COM17",
+    "sketch": "HPR_Rocket_Flight_PC_V4_6\\HPR_Rocket_Flight_PC_V4_6.ino"
+}
