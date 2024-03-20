@@ -276,7 +276,7 @@ void createNextFileSD(){
   outputFile.print(codeVersion);
   outputFile.print(F(",accelX,accelY,accelZ,gyroX,gyroY,gyroZ,highGx,highGy,highGz,"));
   if(settings.testMode){outputFile.print(F("cyclesBtwn,writeFlags,sampleTime,"));}
-  outputFile.println(F("smoothHighGz,rollZ,yawY,pitchX,offVert,intVel,intAlt,fusionVel,fusionAlt,fltEvents,radioCode,pyroCont,pyroFire,pyroPin,baroAlt,altMoveAvg,baroVel,baroPress,baroTemp,battVolt,magX,magY,magZ,gnssLat,gnssLon,gnssSpeed,gnssAlt,gnssAngle,gnssSatellites,radioPacketNum"));
+  outputFile.println(F("smoothHighGz,rollZ,yawY,pitchX,offVert,intVel,intAlt,fusionVel,fusionAlt,fltEvents,radioCode,pyroCont,pyroFire,pyroPin,baroAlt,altMoveAvg,baroVel,baroPress,baroTemp,battVolt,magX,magY,magZ,gnssLat,gnssLon,gnssSpeed,gnssAlt,gnssAngle,gnssSatellites,radioPacketNum,deflectionAngle"));
   outputFile.flush();
 
   //create GPS file
@@ -489,6 +489,8 @@ void writeSDflightData(){
   //update the radio packet number
   if (SDradioTX){writeIntData(radio.packetnum);SDradioTX = false;}
   else{dataString[strPosn]=cs;strPosn++;}
+  // Write airbrake deflection angle
+  writeFloatData(getCurrentDeflection(),3);
   //end of sample - carriage return, newline, and null value
   dataString[strPosn] = '\r';strPosn++;
   dataString[strPosn] = '\n';strPosn++;
