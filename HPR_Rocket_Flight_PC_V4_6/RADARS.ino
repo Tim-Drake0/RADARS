@@ -11,7 +11,7 @@
 
 // Rocket Constants
 float diameter = 4.0/12.0; // [ft] body tube diameter (4in)
-float weight = 14.91; // [lb] at burnout
+float weight = 13; // [lb] at burnout
 int num_AB = 4; // Number of airbrakes
 float width_AB = 2.0/12.0; // [ft]
 float length_AB = 3.0/12.0; // [ft]
@@ -22,7 +22,7 @@ float Table_CD[80]; // CD Values From CFD Simulations
 
 // Flight path
 float angle_rad = 3.14159/180.0;
-float flight_angle = 89.0;
+float flight_angle = 86.95;
 
 float Drag;
 float delta_S;
@@ -33,6 +33,15 @@ const float R = 287.05; //R value for dry air
 
 int mult=1;
 int t=0;
+
+float vy_next=732.020997; float vy; // [ft/sec]
+float y_next=1979.83; float y; // [ft]
+float ay;
+
+float getCurrentDeflection(){return delta;}
+
+void setCurrentDeflection(float newDelta){delta=newDelta;}
+
 void getIdealTrajectory(){ 
   Table_CD[0]=0.38; Table_CD[5]=0.395; Table_CD[10]=0.421; Table_CD[15]=0.465; 
   Table_CD[20]=0.495; Table_CD[25]=0.528; Table_CD[30]=0.56; Table_CD[35]=0.59;
@@ -46,9 +55,9 @@ void getIdealTrajectory(){
   float ay;
   float g = -32.2; // [ft/s^2]
   if(settings.testMode){
-    vy_next=671.5; y_next=1732.1;
-    float rho_low = 0.002377; // [slug/ft]
-    float alt_low = 0.0; // [ft]
+    vy_next=671.5; y_next=1979.83;
+    rho_low = 0.002377; // [slug/ft]
+    alt_low = 0.0; // [ft]
   }
   for (int t=0; t<800; t=t+1){
     vy=vy_next;
@@ -75,61 +84,50 @@ void getIdealTrajectory(){
 }//end getIdealTrajectory
 
 void setAirbrakesTest(){
-  Serial.println("Simulating Airbrakes Until Apogee!");
-  float vy_next=671.5; float vy; // [ft/sec]
-  float y_next=1732.1; float y; // [ft]
-  
-  float ay; 
-  float weight = 14.91; // [lb] at burnout
+  //Serial.println("Simulating Airbrakes Until Apogee!");
   float g = -32.2; // [ft/s^2]
+  vy=vy_next; y=y_next;
+  float RocketArea =3.14159*sq(0.5*diameter) + 4*width_AB*length_AB*sinf(delta*angle_rad);// [ft^2] area of rocket including airbrakes
+  float rho_low = 0.002377; float rho_high = 0.002048; // slug/ft 
+  float alt_low = 0.0; float alt_high = 5000.000; // ft
+  float rho = rho_low+((y-alt_low)*(rho_high-rho_low)/(alt_high-alt_low)); // [slug/ft]
+  int d0=0; int d1=10;
+  CD = interpCD();
+  Drag = 0.5*rho*vy*vy*CD*RocketArea; // [lbf]
   
-  uint32_t lastStep=0UL;
-  while(true){
-    uint32_t currentTime = micros();
-    if(currentTime-lastStep>=50000UL){ // every 0.05 seconds
-      lastStep=micros();
-      vy=vy_next; y=y_next;
-      float RocketArea =3.14159*sq(0.5*diameter) + 4*width_AB*length_AB*sinf(delta*angle_rad);// [ft^2] area of rocket including airbrakes
-      float rho_low = 0.002377; float rho_high = 0.002048; // slug/ft 
-      float alt_low = 0.0; float alt_high = 5000.000; // ft
-      float rho = rho_low+((y-alt_low)*(rho_high-rho_low)/(alt_high-alt_low)); // [slug/ft]
-      int d0=0; int d1=10;
-      CD = interpCD();
-      Drag = 0.5*rho*vy*vy*CD*RocketArea; // [lbf]
-      
-      ay = -(((0-Drag)*sin(flight_angle*angle_rad))-weight)/(weight/g);
-      vy_next = vy + ay*0.05;
-      y_next = y + vy_next*0.05;
-      delta_Dreq = dragIdeal[t] - Drag; t=t+1;
-      
-      Cd = Cd+(2*delta_Dreq)/(rho*vy*vy*RocketArea); 
-      delta_S = (2*delta_Dreq)/(rho*vy*vy*Cd); 
-      if(delta_S < 0.0){
-        mult=-1;
-      }else{
-        mult=1;
-      }
-      deltaAngle = mult*asinf((abs(delta_S)/(num_AB*width_AB*length_AB)))*(1.0/angle_rad);
-      delta=delta+deltaAngle;
-      if(delta >= 80.0){delta = 80.0;} // limit to 80deg max deflection
-      
-      airbrake1.write((0.6125*delta)+56-servo1trim);
-      airbrake2.write((0.6125*delta)+56-servo2trim);
-      airbrake3.write((0.6125*delta)+56-servo3trim);
-      airbrake4.write((0.6125*delta)+56-servo4trim);
-      
-      //Debug variables
-      Serial.print("y_next: "); Serial.print(y_next); 
-      Serial.print(" | Drag: "); Serial.print(Drag); 
-      Serial.print(" | Ideal Drag: "); Serial.print(dragIdeal[t-1]); 
-      Serial.print(" | delta_Dreq: "); Serial.print(delta_Dreq); 
-      Serial.print(" | delta_S: "); Serial.print(delta_S,4);
-      Serial.print(" | deltaAngle: "); Serial.print(deltaAngle); 
-      Serial.print(" | delta: "); Serial.println(delta);
-      if(y_next-y<0){return;} // Only simulate until apogee
-      if(dragIdeal[t]<=0.0){return;} // Only simulate positive ideal drag values
-    }
+  ay = -(((0-Drag)*sin(flight_angle*angle_rad))-weight)/(weight/g);
+  vy_next = vy + ay*0.05;
+  y_next = y + vy_next*0.05;
+  delta_Dreq = dragIdeal[t] - Drag; t=t+1;
+  
+  Cd = Cd+(2*delta_Dreq)/(rho*vy*vy*RocketArea); 
+  delta_S = (2*delta_Dreq)/(rho*vy*vy*Cd); 
+  if(delta_S < 0.0){
+    mult=-1;
+  }else{
+    mult=1;
   }
+  deltaAngle = mult*asinf((abs(delta_S)/(num_AB*width_AB*length_AB)))*(1.0/angle_rad);
+  delta=delta+deltaAngle;
+  if(delta >= 80.0){delta = 80.0;} // limit to 80deg max deflection
+  
+  airbrake1.write((0.6125*delta)+56-servo1trim);
+  airbrake2.write((0.6125*delta)+56-servo2trim);
+  airbrake3.write((0.6125*delta)+56-servo3trim);
+  airbrake4.write((0.6125*delta)+56-servo4trim);
+  
+  //Debug variables
+  Serial.print("y_next: "); Serial.print(y_next); 
+  Serial.print(" | Drag: "); Serial.print(Drag); 
+  Serial.print(" | Ideal Drag: "); Serial.print(dragIdeal[t-1]); 
+  Serial.print(" | delta_Dreq: "); Serial.print(delta_Dreq); 
+  Serial.print(" | delta_S: "); Serial.print(delta_S,4);
+  Serial.print(" | deltaAngle: "); Serial.print(deltaAngle); 
+  Serial.print(" | delta: "); Serial.println(delta);
+  if(y_next-y<0){return;} // Only simulate until apogee
+  if(dragIdeal[t]<=0.0){return;} // Only simulate positive ideal drag values
+  
+  //}
 }//end setAirbrakesTest
 
 float interpCD(){
@@ -148,7 +146,6 @@ float interpCD(){
 }//end interpCD
 
 void setAirbrakes(){
-  if(settings.testMode && t==0){setAirbrakesTest();return;}
   float accelZ=accel.z;
   float g = -32.2; // [ft/s^2]
   float currentVel = fusionVel;

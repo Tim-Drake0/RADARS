@@ -1949,9 +1949,9 @@ void loop(void){
         //if active stabilization is activated, set the canards
         
         if(settings.testMode){
-          if((settings.stableVert || settings.stableRotn) && !events.apogee){setAirbrakes();} // Removing burnout bool for testing 
+          if((settings.stableVert || settings.stableRotn) && !events.apogee){setAirbrakesTest();} 
         }else{
-          if((settings.stableVert || settings.stableRotn) && !events.apogee && events.boosterBurnout){setAirbrakes();} 
+          if((settings.stableVert || settings.stableRotn) && !events.apogee && events.boosterBurnout){setAirbrakes();}  
         }
         //if RTB is on and we are post apogee, then set canards to return to launch point
         if(settings.flyBack && events.apogeeFire && !events.mainDeploy){setRTB();}        

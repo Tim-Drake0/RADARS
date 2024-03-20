@@ -288,7 +288,12 @@ void checkEvents(){
     radio.event = Apogee;
     if(settings.fltProfile == 'B'){radio.event = Booster_Apogee;} 
     if(settings.inflightRecover != 0 && !settings.testMode){EEPROM.update(eeprom.lastEvent, radio.event);}}
-    
+    // Close airbrakes if apogee ==============================================================================================================
+    //airbrake1.write((0.6125*0.0)+56-servo1trim);
+    //airbrake2.write((0.6125*0.0)+56-servo2trim);
+    //airbrake3.write((0.6125*0.0)+56-servo3trim);
+    //airbrake4.write((0.6125*0.0)+56-servo4trim);
+    //setCurrentDeflection(0.0);
   //Fire apgogee charge if the current time > apogeeTime + apogeeDelay
   if (!events.apogeeFire && events.apogee && fltTime.timeCurrent - fltTime.apogee >= settings.apogeeDelay) {
     events.apogeeFire = true;
