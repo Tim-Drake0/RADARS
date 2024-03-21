@@ -837,10 +837,10 @@ union{
 //Active Stabilization
 //-----------------------------------------
 char userInput;
-int8_t servo1trim = 5;
-int8_t servo2trim = 5;
-int8_t servo3trim = -7;
-int8_t servo4trim = -5;
+int8_t servo1trim = 0;
+int8_t servo2trim = 0;
+int8_t servo3trim = -6;
+int8_t servo4trim = -6;
 int8_t servo5trim = 0;
 int8_t servo6trim = 0;
 int8_t servo7trim = 0;
@@ -1279,23 +1279,12 @@ void setup(void) {
      Serial.print(F("Servo4 Trim: "));Serial.println(servo4trim);}
      
     //Test canards
-    int b=56;
-    float m=0.6125;
-    airbrake1.write((m*75)+b-servo1trim);
-    airbrake2.write((m*75)+b-servo2trim);
-    airbrake3.write((m*75)+b-servo3trim);
-    airbrake4.write((m*75)+b-servo4trim);
+    setAirbrakeDeflection(80.0);
     delay(1000);
-    airbrake1.write((m*45)+b-servo1trim);
-    airbrake2.write((m*45)+b-servo2trim);
-    airbrake3.write((m*45)+b-servo3trim);
-    airbrake4.write((m*45)+b-servo4trim);
+    setAirbrakeDeflection(45.0);
     delay(1000);
-    airbrake1.write((m*0)+b-servo1trim);
-    airbrake2.write((m*0)+b-servo2trim);
-    airbrake3.write((m*0)+b-servo3trim);
-    airbrake4.write((m*0)+b-servo4trim);}
-
+    setAirbrakeDeflection(0.0);
+  }
   //otherwise disable the servos and ensure that stray voltages do not cause any attached servos to move
   else{
     pinMode(pins.servo1, OUTPUT);
@@ -1939,7 +1928,8 @@ void loop(void){
       dx = dy = dz = 0L;
       lastRotn = fltTime.timeCurrent;}
  
-    
+     //run event logic
+    checkEvents();
 
     //update the canards throws if stabilization or flyback is enabled
     if(settings.stableRotn || settings.stableVert || settings.flyBack){
@@ -1958,9 +1948,7 @@ void loop(void){
         timeLastControl = controlTime;
       }
     }
-    //run event logic
-    checkEvents();
-    
+   
     //Read the battery voltage
     if((fltTime.timeCurrent - lastVolt > voltRate) || pyroFire){
       voltReading = analogRead(pins.batt);
