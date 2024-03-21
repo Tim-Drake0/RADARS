@@ -852,27 +852,27 @@ void wiggleServo( byte servo){
   switch (servo){
     
   case 1:
-    //canardYaw1.write(80);delay(250);
-    //canardYaw1.write(90);delay(250);
-    canardYaw1.write(90-servo1trim);
+    airbrake1.write((0.6125*45)+56-servo1trim);
+    airbrake1.write((0.6125*90)+56-servo1trim);
+    airbrake1.write((0.6125*0)+56-servo1trim);
     break;
     
   case 2:
-    //canardYaw2.write(80);delay(250);
-    //canardYaw2.write(90);delay(250);
-    canardYaw2.write(90-servo2trim);
+    airbrake2.write((0.6125*45)+56-servo2trim);
+    airbrake2.write((0.6125*90)+56-servo2trim);
+    airbrake2.write((0.6125*0)+56-servo2trim);
     break;
     
   case 3:
-    //canardPitch3.write(80);delay(250);
-    //canardPitch3.write(90);delay(250);
-    canardPitch3.write(90-servo3trim);
+    airbrake3.write((0.6125*45)+56-servo3trim);
+    airbrake3.write((0.6125*90)+56-servo3trim);
+    airbrake3.write((0.6125*0)+56-servo3trim);
     break;
     
   case 4:
-    //canardPitch4.write(80);delay(250);
-    //canardPitch4.write(90);delay(250);
-    canardPitch4.write(90-servo4trim);
+    airbrake4.write((0.6125*45)+56-servo4trim);
+    airbrake4.write((0.6125*90)+56-servo4trim);
+    airbrake4.write((0.6125*0)+56-servo4trim);
     break;
     
   case 5:
