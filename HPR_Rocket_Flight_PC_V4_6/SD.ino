@@ -490,7 +490,7 @@ void writeSDflightData(){
   if (SDradioTX){writeIntData(radio.packetnum);SDradioTX = false;}
   else{dataString[strPosn]=cs;strPosn++;}
   // Write airbrake deflection angle
-  writeFloatData(getCurrentDeflection(),3);
+  writeFloatData(getAirbrakeDeflection(),3);
   //end of sample - carriage return, newline, and null value
   dataString[strPosn] = '\r';strPosn++;
   dataString[strPosn] = '\n';strPosn++;
