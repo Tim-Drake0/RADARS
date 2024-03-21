@@ -30,7 +30,7 @@ void checkEvents(){
     gnss.touchdown.mili = GPS.time.centisecond();}
 
   //Check false trigger until the flight time has passed the minimum time
-  if (events.falseLiftoffCheck) {
+  if (events.falseLiftoffCheck && settings.testMode == 0) {
     if (fltTime.timeCurrent > fltTime.detectLiftoffTime) {events.falseLiftoffCheck = false;}
     //if a negative acceleration is detected within the initial moments of liftoff and the rocket will not go 100 feet
     //then reset flight variables and resume launch detect
@@ -69,11 +69,11 @@ void checkEvents(){
     if(trajectoryEvent==0){
       Serial.println("Getting Ideal Trajectory!");
       trajectoryEvent=1;
-      while(5000.0-yBest > 10.0 || 5000.0-yBest < -10.0) {
+      while(1524.0-yBest > 3.0 || 1524.0-yBest < -3.0) {
         yBest=0.0;
         getIdealTrajectory();
-        if(5000.0-yBest > 0.0){CD=CD-.01;}
-        else if(5000.0-yBest < 0.0){CD=CD+0.01;}
+        if(1524.0-yBest > 0.0){CD=CD-.01;}
+        else if(1524.0-yBest < 0.0){CD=CD+0.01;}
       }
     }
   }
@@ -81,13 +81,13 @@ void checkEvents(){
   if(trajectoryEvent==0 && settings.testMode){
     Serial.println("Getting Ideal Trajectory!");
     trajectoryEvent=1;
-    while(5000.0-yBest > 10.0 || 5000.0-yBest < -10.0) {
+    while(1524.0-yBest > 3.0 || 1524.0-yBest < -3.0) {
       yBest=0.0;
       Serial.print("CD: "); Serial.println(CD);
       getIdealTrajectory();
       Serial.print("yBest: "); Serial.println(yBest);
-      if(5000.0-yBest > 0.0){CD=CD-.01;}
-      else if(5000.0-yBest < 0.0){CD=CD+0.01;}
+      if(1524.0-yBest > 0.0){CD=CD-.01;}
+      else if(1524.0-yBest < 0.0){CD=CD+0.01;}
     }
   }
   //check for booster motor burp for 1 second after burnout is detected
@@ -289,11 +289,7 @@ void checkEvents(){
     if(settings.fltProfile == 'B'){radio.event = Booster_Apogee;} 
     if(settings.inflightRecover != 0 && !settings.testMode){EEPROM.update(eeprom.lastEvent, radio.event);}}
     // Close airbrakes if apogee ==============================================================================================================
-    airbrake1.write((0.6125*0.0)+56-servo1trim);
-    airbrake2.write((0.6125*0.0)+56-servo2trim);
-    airbrake3.write((0.6125*0.0)+56-servo3trim);
-    airbrake4.write((0.6125*0.0)+56-servo4trim);
-    setCurrentDeflection(0.0);
+    if(settings.testMode == 0){setAirbrakeDeflection(0.0);} // only in real flight
   //Fire apgogee charge if the current time > apogeeTime + apogeeDelay
   if (!events.apogeeFire && events.apogee && fltTime.timeCurrent - fltTime.apogee >= settings.apogeeDelay) {
     events.apogeeFire = true;
