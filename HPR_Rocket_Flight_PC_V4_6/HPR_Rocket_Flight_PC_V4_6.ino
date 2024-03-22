@@ -839,7 +839,7 @@ union{
 char userInput;
 int8_t servo1trim = 0;
 int8_t servo2trim = 0;
-int8_t servo3trim = -6;
+int8_t servo3trim = -8;
 int8_t servo4trim = -6;
 int8_t servo5trim = 0;
 int8_t servo6trim = 0;
@@ -1938,7 +1938,7 @@ void loop(void){
         //if active stabilization is activated, set the canards
         
         if(settings.testMode){
-          if((settings.stableVert || settings.stableRotn) && !events.apogee){setAirbrakesTest();} 
+          if(settings.stableVert || settings.stableRotn){setAirbrakesTest();} 
         }else{
           if((settings.stableVert || settings.stableRotn) && !events.apogee && events.boosterBurnout){setAirbrakes();}  
         }

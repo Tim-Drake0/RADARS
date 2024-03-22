@@ -1,4 +1,4 @@
- //----------------------------
+ //----------------------------mass
 //LIST OF FUNCTIONS & ROUTINES
 //----------------------------
 //checkAngle(): Checks that input angle [deg] is within servo deflection limits
@@ -15,7 +15,7 @@ float MAXANGLE = 105;
 float MINANGLE = 56;
 // Rocket Constants
 float diameter = 0.1016; // [m] body tube diameter (4in)
-float weight = 5.8967; // [kg] at burnout
+float mass = 6.64; // [kg] at burnout
 int num_AB = 4; // Number of airbrakes
 float width_AB = 0.0508; // [m]
 float length_AB = 0.0762; // [m]
@@ -84,7 +84,7 @@ void getIdealTrajectory(){
     float Swet_tube = 3.14159*sq(0.5*diameter); // [m^2]
     Drag = 0.5*rho*vy*vy*CD*Swet_tube; // [N]
     
-    ay = ((0.0-Drag-(weight*-g))*sinf(flight_angle*angle_rad))/weight; // [m/s^2]
+    ay = ((0.0-Drag-(mass*-g))*sinf(flight_angle*angle_rad))/mass; // [m/s^2]
     vy_next = vy + ay*0.05;  // [m/s]
     y_next = y + vy_next*0.05;  // [m]
     if(y_next-y<0.0 || y_next > 1828.8){break;} // Only simulate until apogee
@@ -104,25 +104,25 @@ void getIdealTrajectory(){
 
 void setAirbrakesTest(){
   if(t==1){vy_next=223.12; y_next=603.452184; }
-  //Serial.println("Simulating Airbrakes Until Apogee!");
   float g = -9.81; // [m/s^2]
   vy=vy_next; y=y_next;
-  float RocketArea =3.14159*sq(0.5*diameter) + 4*width_AB*length_AB*sinf(delta*angle_rad);// [m^2] area of rocket including airbrakes
-  float rho_low = 1.225; float rho_high = 1.05549; // [kg/m^3] 
-  float alt_low = 0.0; float alt_high = 1524.000; // ft
+  float RocketArea = 3.14159*sq(0.5*diameter) + 4*width_AB*length_AB*sinf(delta*angle_rad);// [m^2] area of rocket including airbrakes
+  float rho_low = (baro.pressure * 100) / (R * (baro.temperature + 273.15)); float rho_high = 1.05549; // [kg/m^3] 
+  float alt_low = fusionAlt; float alt_high = 1524.000; // ft
   float rho = rho_low+((y-alt_low)*(rho_high-rho_low)/(alt_high-alt_low)); // [kg/m^3] 
   int d0=0; int d1=10;
   CD = interpCD();
   Drag = 0.5*rho*vy*vy*CD*RocketArea; // [N]
   
-  ay = ((0.0-Drag-(weight*-g))*sinf(flight_angle*angle_rad))/weight; // [m/s^2]
+  ay = ((0.0-Drag-(mass*-g))*sinf(flight_angle*angle_rad))/mass; // [m/s^2]
   vy_next = vy + ay*0.05; // [m/2]
   y_next = y + vy_next*0.05; // [m]
+  if(y_next < y){setAirbrakeDeflection(0.0); return;} // Only deflect until apogee
   delta_Dreq = dragIdeal[t] - Drag; t=t+1; // [N]
   
   Cd = Cd+(2*delta_Dreq)/(rho*vy*vy*RocketArea); 
   delta_S = (2*delta_Dreq)/(rho*vy*vy*Cd); // [m^2]
-  if(delta_S < 0.0){
+  if(delta_Dreq < 0.0){
     mult=-1;
   }else{
     mult=1;
@@ -133,7 +133,7 @@ void setAirbrakesTest(){
   if(delta < 0.0){delta = 0.0;} // limit to 0deg min deflection
   
   setAirbrakeDeflection(delta);
-
+  
   //Debug variables
   Serial.print("y_next: "); Serial.print(y_next); 
   Serial.print(" | vy_next: "); Serial.print(vy_next);
@@ -144,10 +144,7 @@ void setAirbrakesTest(){
   Serial.print(" | delta_S: "); Serial.print(delta_S,4);
   Serial.print(" | deltaAngle: "); Serial.print(deltaAngle); 
   Serial.print(" | delta: "); Serial.println(delta);
-  if(y_next-y<0){return;} // Only simulate until apogee
   if(dragIdeal[t]<=0.0){return;} // Only simulate positive ideal drag values
-  
-  //}
 }//end setAirbrakesTest
 
 float interpCD(){
@@ -171,7 +168,7 @@ void setAirbrakes(){
   //Calculate air density
   float airDensity = (baro.pressure * 100) / (R * (baro.temperature + 273.15)); // [kg/m^3]
   // Calculate area of rocket with airbrakes
-  float RocketArea =(3.14159*sq(0.5*diameter) + 4*width_AB*length_AB*sinf(delta*angle_rad))/10.764;// [m^2] area of rocket including airbrakes
+  float RocketArea = 3.14159*sq(0.5*diameter) + 4*width_AB*length_AB*sinf(delta*angle_rad);// [m^2] 
   CD = interpCD();
 
   Drag = 0.5*airDensity*currentVel*currentVel*CD*RocketArea; // [N]
